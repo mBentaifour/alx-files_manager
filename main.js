@@ -7,18 +7,18 @@ const waitConnection = () => {
             await setTimeout(() => {
                 i += 1;
                 if (i >= 10) {
-                    reject()
-                }
-                else if(!dbClient.isAlive()) {
-                    repeatFct()
-                }
-                else {
-                    resolve()
+                    reject('Connection timeout'); // Ajout d'un message d'erreur
+                } else if (!dbClient.isAlive()) {
+                    repeatFct();
+                } else {
+                    resolve();
                 }
             }, 1000);
         };
         repeatFct();
-    })
+    }).catch((error) => {
+        console.error('Error:', error); // Affiche l'erreur dans la console
+    });
 };
 
 (async () => {
@@ -27,4 +27,7 @@ const waitConnection = () => {
     console.log(dbClient.isAlive());
     console.log(await dbClient.nbUsers());
     console.log(await dbClient.nbFiles());
-})();
+})().catch((error) => {
+    console.error('Async error:', error); // Capturer les erreurs dans le code async
+});
+

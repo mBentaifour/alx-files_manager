@@ -1,50 +1,60 @@
 import { createClient } from 'redis';
 
-// Définition de la classe RedisClient
 class RedisClient {
   constructor() {
     // Création du client Redis
     this.client = createClient();
-    this.client.on('error', (error) => console.error(`Redis Client Error: ${error}`));
+    this.client.on('error', (err) => {
+      console.error(`Redis Client Error: ${err}`);
+    });
   }
 
-  // Vérifie si la connexion à Redis est active
+  // Vérifie si la connexion Redis est active
   isAlive() {
     return this.client.connected;
   }
 
-  // Récupère la valeur d'une clé donnée
+  // Récupère la valeur associée à une clé Redis
   async get(key) {
     return new Promise((resolve, reject) => {
       this.client.get(key, (err, value) => {
-        if (err) reject(err);
-        resolve(value);
+        if (err) {
+          reject(err);
+        } else {
+          resolve(value);
+        }
       });
     });
   }
 
-  // Stocke une valeur avec expiration en secondes
+  // Définit une valeur avec une durée d'expiration
   async set(key, value, duration) {
     return new Promise((resolve, reject) => {
       this.client.setex(key, duration, value, (err) => {
-        if (err) reject(err);
-        resolve(true);
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
       });
     });
   }
 
-  // Supprime une clé
+  // Supprime une clé Redis
   async del(key) {
     return new Promise((resolve, reject) => {
       this.client.del(key, (err) => {
-        if (err) reject(err);
-        resolve(true);
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
       });
     });
   }
 }
 
-// Création et exportation de l'instance RedisClient
+// Exporter une instance de RedisClient
 const redisClient = new RedisClient();
 export default redisClient;
 

@@ -1,34 +1,52 @@
-// controllers/AppController.js
-import redisClient from '../utils/redis.js';
-import dbClient from '../utils/db.js';
+/* eslint-disable import/no-named-as-default */
+import redisClient from '../utils/redis';
+import dbClient from '../utils/db';
 
-class AppController {
-  // Méthode pour vérifier si Redis et la DB sont vivants
-  static async getStatus(req, res) {
-    const redisStatus = redisClient.isAlive();
-    const dbStatus = dbClient.isAlive();
-
+export default class AppController {
+  static getStatus(req, res) {
     res.status(200).json({
-      redis: redisStatus,
-      db: dbStatus,
+      redis: redisClient.isAlive(),
+      db: dbClient.isAlive(),
     });
   }
 
-  // Méthode pour obtenir les statistiques des utilisateurs et des fichiers
-  static async getStats(req, res) {
-    try {
-      const nbUsers = await dbClient.nbUsers();
-      const nbFiles = await dbClient.nbFiles();
-
-      res.status(200).json({
-        users: nbUsers,
-        files: nbFiles,
+  static getStats(req, res) {
+    Promise.all([dbClient.nbUsers(), dbClient.nbFiles()])
+      .then(([usersCount, filesCount]) => {
+        res.status(200).json({ users: usersCount, files: filesCount });
       });
-    } catch (err) {
-      res.status(500).json({ error: 'Error fetching stats' });
-    }
   }
 }
 
-export default AppController;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -11,42 +11,39 @@ class UsersController {
    * @param {Response} res Express response object
    */
   static async postNew(req, res) {
-    // Extract email and password from request body
     const { email, password } = req.body;
 
-    // Check if email is provided
     if (!email) {
       return res.status(400).json({ error: 'Missing email' });
     }
 
-    // Check if password is provided
     if (!password) {
       return res.status(400).json({ error: 'Missing password' });
     }
 
-    // Check if user already exists
-    const existingUser = await dbClient.db.collection('users')
-      .findOne({ email });
-    
-    if (existingUser) {
-      return res.status(400).json({ error: 'Already exist' });
-    }
+    try {
+      const existingUser = await dbClient.db.collection('users')
+        .findOne({ email });
 
-    // Hash password and create new user
-    const hashedPassword = sha1(password);
-    const result = await dbClient.db.collection('users')
-      .insertOne({
+      if (existingUser) {
+        return res.status(400).json({ error: 'Already exist' });
+      }
+
+      const hashedPassword = sha1(password);
+      const result = await dbClient.db.collection('users')
+        .insertOne({
+          email,
+          password: hashedPassword,
+        });
+
+      return res.status(201).json({
+        id: result.insertedId,
         email,
-        password: hashedPassword,
       });
-
-    // Return new user data
-    return res.status(201).json({
-      id: result.insertedId,
-      email,
-    });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
   }
 }
 
 export default UsersController;
-

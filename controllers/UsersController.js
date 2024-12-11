@@ -1,5 +1,7 @@
 import sha1 from 'sha1';
+import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 /**
  * Controller handling User related operations
@@ -43,6 +45,35 @@ class UsersController {
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
+  }
+
+  /**
+   * Retrieves the current user's information
+   * @param {Request} req Express request object
+   * @param {Response} res Express response object
+   */
+  static async getMe(req, res) {
+    const token = req.header('X-Token');
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const key = `auth_${token}`;
+    const userId = await redisClient.get(key);
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const user = await dbClient.db.collection('users')
+      .findOne({ _id: ObjectId(userId) });
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    return res.status(200).json({
+      id: user._id,
+      email: user.email,
+    });
   }
 }
 

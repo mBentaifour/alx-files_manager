@@ -14,11 +14,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bull": "^3.16.0",
+    "bull": "^3.29.3",
     "express": "^4.17.1",
-    "image-thumbnail": "^1.0.10",
+    "fs": "0.0.1-security",
+    "image-thumbnail": "^1.0.17",
     "mime-types": "^2.1.27",
     "mongodb": "^3.5.9",
+    "path": "^0.12.7",
     "redis": "^2.8.0",
     "sha1": "^1.1.1",
     "uuid": "^8.2.0"
